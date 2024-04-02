@@ -4,60 +4,83 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicStampedReference
 
-// Exchanger is a lock-free object that permits two threads
-// to exchange values, within a time limit.
-internal class Exchanger<T> {
-private    var slot: AtomicStampedReference<T?> = AtomicStampedReference(null, 0)
+/**
+ * A concurrent object that allows for asynchronous object exchange.
+ *
+ * @param T the type of object that can be exchanged
+ */
+class Exchanger<T> {
+    private val slot: AtomicStampedReference<T?> = AtomicStampedReference(null, 0)
 
-
+    /**
+     * Exchanges the object with the specified value.
+     * @param y the object to deposit into the exchange
+     * @param timeout the maximum time to wait for an object, in units of [unit]
+     * @param unit the time unit for the [timeout] argument
+     * @return the object withdrawn from the exchange, or `null` if the timeout expired
+     * @throws TimeoutException if the timeout expired before an object was available
+     */
     @Throws(TimeoutException::class)
     fun exchange(y: T, timeout: Long, unit: TimeUnit): T? {
-        val wMax = unit.toNanos(timeout)/1000// 1
-//        val wMax = System.nanoTime() // 1
-        val stamp = intArrayOf(EMPTY)
-        while (System.nanoTime() < wMax) { // 2
-            var x = slot[stamp] // 3
+        val wMax = unit.toNanos(timeout) / 1000
+        val stamp = IntArray(1)
+        while (System.nanoTime() < wMax) {
+            var x = slot[stamp]
             when (stamp[0]) {
-                EMPTY -> if (addA(y)) { // 4
-                    while (System.nanoTime() < wMax) // 4
-                        if ((removeB().also { x = it }) != null) return x // 4
+                EMPTY -> if (addA(y)) {
+                    while (System.nanoTime() < wMax)
+                        if ((removeB().also { x = it }) != null) return x
 
-                    throw TimeoutException() // 5
+                    throw TimeoutException()
                 }
 
-                WAITING -> if (addB(x, y)) // 7
-                    return x // 7
-
+                WAITING -> if (addB(x, y)) return x
                 BUSY -> {}
                 else -> {}
             }
         }
-        throw TimeoutException() // 2
+        throw TimeoutException()
     }
 
-
-    private fun addA(y: T): Boolean { // 1, 2
+    /**
+     * Adds an object to the exchange, if possible.
+     *
+     * @param y the object to add to the exchange
+     * @return `true` if the object was added to the exchange, or `false` if the object could not be added because another
+     * thread is currently withdrawing the object
+     */
+    private fun addA(y: T): Boolean {
         return slot.compareAndSet(null, y, EMPTY, WAITING)
     }
 
-
-    private fun addB(x: T?, y: T): Boolean { // 1, 2
+    /**
+     * Adds an object to the exchange, if possible.
+     * @param x the expected value of the object currently in the exchange
+     * @param y the object to add to the exchange
+     * @return `true` if the object was added to the exchange, or `false` if the object could not be added because the
+     * expected value of the object currently in the exchange does not match the actual value
+     */
+    private fun addB(x: T?, y: T): Boolean {
         return slot.compareAndSet(x, y, WAITING, BUSY)
     }
 
-
+    /**
+     * Removes an object from the exchange, if possible.
+     *
+     * @return the object removed from the exchange, or `null` if no object was available
+     */
     private fun removeB(): T? {
-        val stamp = intArrayOf(EMPTY)
-        val x = slot[stamp] // 1
-        if (stamp[0] != BUSY) return null // 1
+        val stamp = IntArray(1)
+        val x = slot[stamp]
+        if (stamp[0] != BUSY) return null
 
-        slot[null] = EMPTY // 2
-        return x // 2
+        slot[null] = EMPTY
+        return x
     }
 
-    companion object {
-        const val EMPTY: Int = 0
-        const val WAITING: Int = 1
-        const val BUSY: Int = 2
+    private companion object {
+        private const val EMPTY = 0
+        private const val WAITING = 1
+        private const val BUSY = 2
     }
 }

@@ -5,18 +5,22 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 
-// Elimination array provides a list of exchangers which
-// are picked at random for a given value.
+
+/**
+ * A concurrent array that uses the elimination-backoff algorithm to provide
+ * concurrent read/write access to an array of objects. 
+ * @param T the type of object stored in the array
+ * @param capacity the capacity of the array
+ * @param timeout the timeout period for exchanges
+ * @param unit the time unit for the timeout period
+ */
 internal class EliminationArray<T>(capacity: Int, timeout: Long, unit: TimeUnit) {
     private var exchangers: Array<Exchanger<T>?> = arrayOfNulls<Exchanger<T>>(capacity)
     private val timeout: Long
     private val unit: TimeUnit
     private var random: Random
 
-    // exchangers: array of exchangers
-    // TIMEOUT: exchange timeout number
-    // UNIT: exchange timeout unit
-    // random: random number generator
+
     init {
         for (i in 0 until capacity) exchangers[i] = Exchanger()
         random = Random()
@@ -24,7 +28,13 @@ internal class EliminationArray<T>(capacity: Int, timeout: Long, unit: TimeUnit)
         this.unit = unit
     }
 
-    // 1. Try exchanging value on a random exchanger.
+    /**
+     * Visits an element in the array, attempting to read or write it concurrently.
+     *
+     * @param item the element to visit
+     * @return the element that was read or written, or null if the visit timed out
+     * @throws TimeoutException if the visit timed out
+     */
     @Throws(TimeoutException::class)
     fun visit(item: T): T? {
         val i = random.nextInt(exchangers.size)
