@@ -9,8 +9,8 @@ The following experiment is based on the article ["A Scalable Lock-free Stack Al
   - _time limits chosen for the experiment are: 1000, 2000, 4000, 8000 ms_
   - _numbers of threads chosen for the experiment are: 1, 2, 4, 8, 14, 32_
 - Each thread performs stack operations and then waits for a period of time, whose length is chosen uniformly at random from the range: [0 ... workload]
-  - _$workload = 100$ throughout the experiment_
-  - _$workload$ is a simulation of the work that can be done by threads between stack operations in a real application_
+  - $workload = 100$ _throughout the experiment_
+  - $workload$ _is a simulation of the work that can be done by threads between stack operations in a real application_
 - The experiment measures the number of operation performed by each stack within a time limit using the given number of threads
 
 ## Expected results
