@@ -51,36 +51,47 @@ class HardSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
      */
     override fun delete(key: K): K? {
         val node = find(key, root) ?: return null
-        deleteNode(key)
+        deleteNode(node)
         return node.key
     }
 
-    private fun deleteNode(key: K) {
-        TODO("not yet implemented")
+    private fun deleteNode(node: Node<K, V>) {
+        if (node.left == null && node.right == null) deleteLeaf(node)
+        else if (node.left == null || node.right == null) deleteNodeWithOneChild(node)
+        else deleteNodeWithTwoChildren(node)
     }
 
     private fun deleteNodeWithOneChild(node: Node<K, V>) {
-        val nodeParent = findParent(node)
-
+        val newNode = if (node.left == null) node.right else node.left
+        replaceNode(node, newNode)
     }
 
     private fun deleteNodeWithTwoChildren(node: Node<K, V>) {
-        TODO("not yet")
+        val successor = findSuccessor(node)
+        node.key = successor.key
+        node.value = successor.value
+        deleteNode(successor)
     }
 
     private fun deleteLeaf(node: Node<K, V>) {
         replaceNode(node, null)
     }
 
-    private fun replaceNode(nodeToReplace: Node<K, V>?, nodeToReplaceWith: Node<K, V>?) {
-        TODO("not yet")
+    private fun replaceNode(nodeToReplace: Node<K, V>, nodeToReplaceWith: Node<K, V>?) {
+        val parent = nodeToReplace.parent
+        if (parent == null) {
+            root = nodeToReplaceWith
+        } else if (parent.left == nodeToReplace) parent.left = nodeToReplaceWith
+        else parent.right = nodeToReplaceWith
+        nodeToReplaceWith?.parent = parent
     }
 
-    private fun findParent(node: Node<K, V>): Node<K, V>? {
-        return if (node == root || root == null) null
-        else if (root?.left == node || root?.right == node) root
-        else if (node.key < root?.key!!) findParent(root?.left!!)
-        else findParent(root?.right!!)
+    private fun findSuccessor(node: Node<K, V>): Node<K, V> {
+        var successor = node.left ?: throw IllegalStateException("Node must have two children")
+        while (successor.right != null) {
+            successor = successor.right ?: throw IllegalStateException("Successor must have the right child")
+        }
+        return successor
     }
 
     /**
