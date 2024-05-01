@@ -5,13 +5,15 @@ import org.example.Node
 import java.security.InvalidKeyException
 
 class HardSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
-    val mutex = Mutex()
+    private val mutex = Mutex()
 
     /**
      * Inserting a new node into the tree
      */
-    override fun insert(key: K, value: V?) {
+    override suspend fun insert(key: K, value: V?) {
+        mutex.lock()
         insertNode(key, value)
+        mutex.unlock()
     }
 
     private fun insertNode(key: K, value: V?): Node<K, V> {
@@ -49,10 +51,13 @@ class HardSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
     /**
      * Deleting a node from the tree
      */
-    override fun delete(key: K): K? {
+    override suspend fun delete(key: K): V? {
+        mutex.lock()
         val node = find(key, root) ?: return null
         deleteNode(node)
-        return node.key
+        val returnValue = node.value
+        mutex.unlock()
+        return returnValue
     }
 
     private fun deleteNode(node: Node<K, V>) {
@@ -97,9 +102,11 @@ class HardSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
     /**
      * Searching a specific node in the tree
      */
-    override fun search(key: K): V? {
-        val node = find(key, root) ?: throw InvalidKeyException("No such key in the tree")
-        return node.value
+    override suspend fun search(key: K): V? {
+        mutex.lock()
+        val node = find(key, root)
+        mutex.unlock()
+        return node?.value
     }
 
     override fun find(key: K, root: Node<K, V>?): Node<K, V>? {
