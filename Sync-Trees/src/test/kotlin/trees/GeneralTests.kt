@@ -17,6 +17,7 @@ abstract class GeneralTests<T : AbstractBST<Int, String>>(
 
     @Test
     fun `test insert method`() {
+        // Fill tree with elements
         runBlocking {
             coroutineScope {
                 repeat(nodes) {
@@ -29,15 +30,11 @@ abstract class GeneralTests<T : AbstractBST<Int, String>>(
         }
 
         runBlocking {
-            coroutineScope {
-                repeat(nodes) {
-                    launch(Dispatchers.Default) {
-                        delay(timeDelay())
-                        assertEquals(randomNodes[it].toString(), tree.search(randomNodes[it]))
-                    }
-                }
+            for (i in randomNodes) {
+                assertEquals(i.toString(), tree.search(i))
             }
         }
+
     }
 
     @Test
