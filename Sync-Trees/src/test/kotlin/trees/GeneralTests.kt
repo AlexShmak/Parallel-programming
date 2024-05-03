@@ -8,12 +8,12 @@ import kotlin.random.Random
 
 abstract class GeneralTests<T : AbstractBST<Int, String>>(
     treeType: () -> T,
-    private val nodes: Int = 100
+    private val nodes: Int = 10000
 ) {
     private fun timeDelay() = Random.nextLong(100)
 
     private val tree: T = treeType()
-    private var randomNodes = (0..99).shuffled().take(nodes)
+    private var randomNodes = (0..nodes).shuffled().take(nodes)
 
     @Test
     fun `test insert method`() {
