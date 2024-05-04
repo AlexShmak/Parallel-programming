@@ -64,11 +64,17 @@ class SoftSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
      * Deleting a node from the tree
      */
     override suspend fun delete(key: K): V? {
-        val node = find(key, root) ?: return null
+        treeMutex.lock()
+        val node = find(key, root)
+        if (node == null) {
+            treeMutex.unlock()
+            return null
+        }
         val parent = node.parent
         if (parent != null) {
             parent.lock()
-        } else treeMutex.lock()
+            treeMutex.unlock()
+        }
         node.lock()
         deleteNode(node)
         node.unlock()

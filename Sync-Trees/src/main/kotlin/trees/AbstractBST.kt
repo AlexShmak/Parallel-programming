@@ -5,7 +5,15 @@ import org.example.Node
 abstract class AbstractBST<K : Comparable<K>, V> {
     var root: Node<K, V>? = null
 
+    abstract suspend fun insert(key: K, value: V?)
+
+    abstract suspend fun delete(key: K): V?
+
     abstract suspend fun search(key: K): V?
+
+
+    protected abstract suspend fun insertNode(key: K, value: V?): Node<K, V>
+
 
     protected fun find(key: K, root: Node<K, V>?): Node<K, V>? {
         return if (root == null) null
@@ -13,11 +21,6 @@ abstract class AbstractBST<K : Comparable<K>, V> {
         else if (key < root.key) find(key, root.left)
         else find(key, root.right)
     }
-
-    abstract suspend fun insert(key: K, value: V?)
-    protected abstract suspend fun insertNode(key: K, value: V?): Node<K, V>
-
-    abstract suspend fun delete(key: K): V?
 
 
     protected fun deleteNode(node: Node<K, V>) {
