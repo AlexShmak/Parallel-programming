@@ -7,8 +7,6 @@ import java.security.InvalidKeyException
 class SoftSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
 
     private val treeMutex = Mutex()
-    private val mutex = Mutex()
-
 
     /**
      * Inserting a new node into the tree
@@ -35,7 +33,6 @@ class SoftSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
                     val newNode = Node(key, value)
                     currentNode.left = newNode
                     newNode.parent = currentNode
-                    println(currentNode.nodeHoldsLock())
                     currentNode.unlock()
                     return newNode
                 }
@@ -43,22 +40,22 @@ class SoftSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
                     ?: throw IllegalStateException("Left subtree of the current node cannot be equal to null")
                 nextNode.lock()
                 currentNode = nextNode
-                currentNode.unlock()
+                val parent = currentNode.parent ?: throw IllegalStateException("Parent node cannot be equal to null")
+                parent.unlock()
             } else if (comparison > 0) {
                 if (currentNode.right == null) {
                     val newNode = Node(key, value)
                     currentNode.right = newNode
-                    newNode.lock()
                     newNode.parent = currentNode
-                    newNode.unlock()
                     currentNode.unlock()
                     return newNode
                 }
-                val nextNode = currentNode.left
-                    ?: throw IllegalStateException("Left subtree of the current node cannot be equal to null")
+                val nextNode = currentNode.right
+                    ?: throw IllegalStateException("Right subtree of the current node cannot be equal to null")
                 nextNode.lock()
                 currentNode = nextNode
-                currentNode.unlock()
+                val parent = currentNode.parent ?: throw IllegalStateException("Parent node cannot be equal to null")
+                parent.unlock()
             } else throw InvalidKeyException("Such key already exists in the tree")
         }
     }

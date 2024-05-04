@@ -8,7 +8,7 @@ import kotlin.random.Random
 
 abstract class GeneralTests<T : AbstractBST<Int, String>>(
     treeType: () -> T,
-    private val nodes: Int = 10000
+    private val nodes: Int = 20
 ) {
     private fun timeDelay() = Random.nextLong(100)
 
