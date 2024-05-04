@@ -15,7 +15,7 @@ abstract class AbstractBST<K : Comparable<K>, V> {
     protected abstract suspend fun insertNode(key: K, value: V?): Node<K, V>
 
 
-    protected fun find(key: K, root: Node<K, V>?): Node<K, V>? {
+    protected open suspend fun find(key: K, root: Node<K, V>?): Node<K, V>? {
         return if (root == null) null
         else if (key == root.key) root
         else if (key < root.key) find(key, root.left)

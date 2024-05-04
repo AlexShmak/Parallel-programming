@@ -64,23 +64,14 @@ class SoftSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
      * Deleting a node from the tree
      */
     override suspend fun delete(key: K): V? {
-        treeMutex.lock()
-        val node = find(key, root)
-        if (node == null) {
-            treeMutex.unlock()
-            return null
-        }
-        val parent = node.parent
-        if (parent != null) {
-            parent.lock()
-            treeMutex.unlock()
-        }
+        root?.lock()
+        val node = find(key, root) ?: return null
         node.lock()
+        val parent = node.parent
+        parent?.lock()
         deleteNode(node)
         node.unlock()
-        if (parent != null) {
-            parent.unlock()
-        } else treeMutex.unlock()
+        parent?.unlock()
         val returnValue = node.value
         return returnValue
     }
@@ -89,8 +80,28 @@ class SoftSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
      * Searching a specific node in the tree
      */
     override suspend fun search(key: K): V? {
+        root?.lock()
         val node = find(key, root)
         return node?.value
+    }
+
+    override suspend fun find(key: K, root: Node<K, V>?): Node<K, V>? {
+        return if (root == null) null
+        else if (key == root.key) {
+            val nodeToReturn = root
+            root.unlock()
+            nodeToReturn
+        } else if (key < root.key) {
+            val leftSubtree = root.left
+            leftSubtree?.lock()
+            root.unlock()
+            find(key, leftSubtree)
+        } else {
+            val rightSubtree = root.right
+            rightSubtree?.lock()
+            root.unlock()
+            find(key, rightSubtree)
+        }
     }
 
 }
