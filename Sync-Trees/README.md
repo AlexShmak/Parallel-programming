@@ -3,7 +3,7 @@
 ### The following synchronization mechanisms are implemented:
 
 - Hard synchronization
-- Soft synchronization `not yet implemented`
+- Soft synchronization
 - Optimistic synchronization `not yet implemented`
 
 ---
