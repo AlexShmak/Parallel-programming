@@ -15,15 +15,15 @@ abstract class AbstractBST<K : Comparable<K>, V> {
     protected abstract suspend fun insertNode(key: K, value: V?): Node<K, V>
 
 
-    protected open suspend fun find(key: K, root: Node<K, V>?): Node<K, V>? {
-        return if (root == null) null
-        else if (key == root.key) root
-        else if (key < root.key) find(key, root.left)
-        else find(key, root.right)
+    protected open suspend fun find(key: K, startingNode: Node<K, V>?): Node<K, V>? {
+        return if (startingNode == null) null
+        else if (key == startingNode.key) startingNode
+        else if (key < startingNode.key) find(key, startingNode.left)
+        else find(key, startingNode.right)
     }
 
 
-    protected fun deleteNode(node: Node<K, V>) {
+    protected open fun deleteNode(node: Node<K, V>) {
         if (node.left == null && node.right == null) deleteLeaf(node)
         else if (node.left == null || node.right == null) deleteNodeWithOneChild(node)
         else deleteNodeWithTwoChildren(node)

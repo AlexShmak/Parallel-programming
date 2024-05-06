@@ -55,8 +55,8 @@ class HardSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
     override suspend fun delete(key: K): V? {
         mutex.lock()
         val node = find(key, root) ?: return null
-        deleteNode(node)
         val returnValue = node.value
+        deleteNode(node)
         mutex.unlock()
         return returnValue
     }
