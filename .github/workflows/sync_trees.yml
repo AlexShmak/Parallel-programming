@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./4-Parallel-Trees
+        working-directory: ./Sync-Trees
 
     steps:
     - name: Checkout project sources
