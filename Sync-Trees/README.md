@@ -4,7 +4,15 @@
 
 - Hard synchronization
 - Soft synchronization
-- Optimistic synchronization `not yet implemented`
+- Optimistic synchronization
+
+### Testing
+
+Each of the tree data structures are tested on a set of unit-tests to verify:
+
+- Correct concurrent ***node insertion***
+- Correct concurrent ***node deletion***
+- Correct concurrent combined (***insert, delete, search***)
 
 ---
 > Synchronization methods are implemented according to
