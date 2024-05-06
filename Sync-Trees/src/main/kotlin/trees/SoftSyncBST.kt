@@ -79,14 +79,12 @@ class SoftSyncBST<K : Comparable<K>, V> : AbstractBST<K, V>() {
             return null
         }
         val node = find(key, root) ?: return null
-
         if (node == root) {
             val returnValue = node.value
             deleteNode(node)
             return returnValue
         }
         deleteNode(node)
-
         return node.value
     }
 
