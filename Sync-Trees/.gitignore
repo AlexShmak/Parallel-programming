@@ -5,7 +5,6 @@ build/
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
-.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -17,8 +16,27 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
 ### VS Code ###
 .vscode/
 
-### Obsidian ###
-.obsidian
+### Mac OS ###
+.DS_Store
