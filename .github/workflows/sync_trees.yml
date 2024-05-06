@@ -15,15 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./4-Parallel-Trees
+        working-directory: ./Sync-Trees
 
     steps:
     - name: Checkout project sources
       uses: actions/checkout@v4
-
+      
     - name: Setup gradle
       uses: gradle/gradle-build-action@v2
 
+    - name: Make ./gradlew executable
+      run: chmod +x ./gradlew
+      
     - name: Build
       run: ./gradlew build
 
